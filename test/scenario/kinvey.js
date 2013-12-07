@@ -21,7 +21,7 @@ describe('$kinvey', function() {
         $kinvey = $injector.get('$kinvey');
     });
 
-    describe('$kinvey.handshake', function() {
+    xdescribe('$kinvey.handshake', function() {
 
         it('should resolve the handshake without error', function() {
             var result;
@@ -39,7 +39,7 @@ describe('$kinvey', function() {
 
     });
 
-    describe('$kinvey.User', function() {
+    xdescribe('$kinvey.User', function() {
 
         it('should check that the username is available', function() {
             var result;
@@ -276,7 +276,7 @@ describe('$kinvey', function() {
 
     });
 
-    describe('$kinvey.Group', function() {
+    xdescribe('$kinvey.Group', function() {
 
         var _id = 'testGroup';
         var user;
@@ -385,7 +385,7 @@ describe('$kinvey', function() {
 
     describe('$kinvey.Object(\'classname\')', function() {
 
-        describe('simple CRUD', function() {
+        xdescribe('simple CRUD', function() {
 
             var object;
             var user;
@@ -471,7 +471,7 @@ describe('$kinvey', function() {
 
         });
 
-        describe('multiple CRUD', function() {
+        xdescribe('multiple CRUD', function() {
 
             var user;
 
@@ -589,7 +589,7 @@ describe('$kinvey', function() {
 
         });
 
-        describe('complex queries', function() {
+        xdescribe('complex queries', function() {
 
             var user;
 
@@ -681,7 +681,7 @@ describe('$kinvey', function() {
 
         });
 
-        describe('aggregation', function() {
+        xdescribe('aggregation', function() {
 
             var user;
 
@@ -789,9 +789,106 @@ describe('$kinvey', function() {
 
         });
 
+        describe('issue #16', function() {
+
+            var object;
+            var user;
+
+            var expected = {
+                name: "Disney",
+                nameSearch: "disney",
+                handles: {
+                    all: ["@disney", "@disneystore"],
+                    default: "@disney"
+                },
+                twitter_handles: {
+                    all: ["@disney", "@disneystore"],
+                    default: "@disney"
+                }
+            };
+
+            it('should signup the temporary user', function() {
+                runs(function() {
+                    user = $kinvey
+                        .User
+                        .signup({
+                            username: 'groupTestUsername',
+                            password: 'testPassword',
+                            firstName: 'Test',
+                            lastName: 'User'
+                        });
+                });
+                waitsFor(function() {
+                    return user.$resolved;
+                });
+            });
+
+            it('should create an alias', function() {
+                $kinvey.alias('classname', 'TestObject');
+            });
+
+            it('should create a test object', function() {
+                runs(function() {
+                    object = new $kinvey.TestObject(expected);
+                    object.$save();
+                });
+                waitsFor(function() {
+                    return object.$resolved;
+                });
+                runs(function() {
+                    expect(object._id).toBeDefined();
+                    expect(object.name).toBe(expected.name);
+                    expect(object.nameSearch).toBe(expected.nameSearch);
+                    expect(object.handles.all[0]).toBe(expected.handles.all[0]);
+                    expect(object.handles.all[1]).toBe(expected.handles.all[1]);
+                    expect(object.handles.default).toBe(expected.handles.default);
+                    expect(object.twitter_handles.all[0]).toBe(expected.twitter_handles.all[0]);
+                    expect(object.twitter_handles.all[1]).toBe(expected.twitter_handles.all[1]);
+                    expect(object.twitter_handles.default).toBe(expected.twitter_handles.default);
+                });
+            });
+
+            it('should fetch the test object', function() {
+                runs(function() {
+                    object = $kinvey.TestObject.get({_id: object._id});
+                });
+                waitsFor(function() {
+                    return object.$resolved;
+                });
+                runs(function() {
+                    expect(object._id).toBeDefined();
+                    expect(object.name).toBe(expected.name);
+                    expect(object.nameSearch).toBe(expected.nameSearch);
+                    expect(object.handles.all[0]).toBe(expected.handles.all[0]);
+                    expect(object.handles.all[1]).toBe(expected.handles.all[1]);
+                    expect(object.handles.default).toBe(expected.handles.default);
+                    expect(object.twitter_handles.all[0]).toBe(expected.twitter_handles.all[0]);
+                    expect(object.twitter_handles.all[1]).toBe(expected.twitter_handles.all[1]);
+                    expect(object.twitter_handles.default).toBe(expected.twitter_handles.default);
+                });
+            });
+
+            it('should delete the test object', function() {
+                runs(function() {
+                    object.$delete();
+                });
+            });
+
+            it('should delete the temporary user', function() {
+                var response;
+                runs(function() {
+                    response = $kinvey.User.delete({_id: user._id});
+                });
+                waitsFor(function() {
+                    return response.$resolved;
+                });
+            });
+
+        });
+
     });
 
-    describe('$kinvey.rpc', function() {
+    xdescribe('$kinvey.rpc', function() {
         var user;
 
         it('should signup the temporary user', function() {
@@ -835,7 +932,7 @@ describe('$kinvey', function() {
 
     });
 
-    describe('$kinvey.File', function() {
+    xdescribe('$kinvey.File', function() {
         var user;
         var file;
         var fileId;
